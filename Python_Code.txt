@@ -1,0 +1,67 @@
+Arduino Haptic Code   
+#include <Sparkfun_DRV2605L.h> //SparkFun Haptic Motor Driver Library   
+#include <Wire.h> //I2C library   
+SFE_HMD_DRV2605L HMD; //Create haptic motor driver object   
+int inByte = 0;   
+void setup() {  
+  HMD.begin();  
+  Serial.begin(9600);  
+  pinMode(9, OUTPUT);  
+  pinMode(10, OUTPUT);  
+  pinMode(11, OUTPUT);  
+  pinMode(6, OUTPUT);  
+  HMD.Mode(0); // Internal trigger input mode -- Must use the GO() function to trigger playback.  
+  HMD.MotorSelect(0x36); // ERM motor, 4x Braking, Medium loop gain, 1.365x back EMF gain  
+  HMD.Library(2); //1-5 & 7 for ERM motors, 6 for LRA motors  
+}  
+void loop() {  
+   char input_data [4];  
+   bool low_high [4];  
+   HMD.Waveform(0, 1);  
+
+   if(Serial.available() >= 4){  
+         for (int i=0; i<3; i++) {  
+             input_data[i] = Serial.read();  
+
+             if(input_data[i] == 48) //ASCII for 0  
+                 low_high[i] = false;  
+
+             if(input_data[i] == 49) //ASCII for 1  
+                 low_high[i] = true;  
+
+
+         }   
+    }  
+    for (int j=0; j<4; j++) {  
+        if(low_high[j]) {  
+          if (j==0){  
+            analogWrite(6,HIGH);  
+          }  
+          if (j==1){  
+            analogWrite(9,HIGH);  
+           }   
+          if (j==2){  
+            analogWrite(10,HIGH);  
+          }   
+          if (j==3){  
+            analogWrite(11,HIGH);  
+          } 	  
+          delay(50);  
+        }   
+        else {  
+          if (j==0){  
+            analogWrite(6,LOW);  
+          }  
+          if (j==1){  
+            analogWrite(9,LOW);  
+          }   
+          if (j==2){  
+            analogWrite(10,LOW);  
+          }   
+          if (j==3){  
+            analogWrite(11,LOW);  
+          } 	  
+        }   
+    }  
+ }  
+ 
